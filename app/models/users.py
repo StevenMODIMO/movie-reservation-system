@@ -7,6 +7,7 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True, nullable=False)
     password: str
     username: str
+    avatar_url: str
 
 class Role(SQLModel, table=True):
     __tablename__ = "roles"

@@ -16,4 +16,4 @@ app.include_router(users.router)
 
 @app.get("/", tags=["Home"])
 def root():
-	return { "OK": "OK"}	
+	return { "OK": "OK"}
