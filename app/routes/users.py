@@ -6,16 +6,18 @@ from vercel.blob import AsyncBlobClient
 from models.users import User
 from sqlmodel import Session, select
 from dependencies import get_db_session
-from security import hash_password
+from security import hash_password, verify_password, create_access_token
 import re
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-
-SessionDep =Annotated[Session, Depends(get_db_session)]
+from config import settings
+from datetime import timedelta
 
 router = APIRouter(tags=["User (authentication and authorization)"], prefix="/api/users")
 
 ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp", "image/svg+xml"}
 EMAIL_REGEX = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/users/login")
 
 def generate_unique_filename(file: UploadFile):
     ext = os.path.splitext(file.filename)[1]
@@ -26,7 +28,7 @@ async def signup(
     email: Annotated[str, Form()],
     password: Annotated[str, Form()],
     username: Annotated[str, Form()],
-    session: SessionDep,
+    session: Annotated[Session, Depends(get_db_session)],
     file: Annotated[UploadFile | None, File()] = None
     ):
     if not re.match(EMAIL_REGEX, email):
@@ -72,11 +74,28 @@ async def signup(
         }
 
 @router.post("/login")
-async def login():
-    pass
+async def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session: Annotated[Session, Depends(get_db_session)]
+    ):
+    statement = select(User).where(User.email == form_data.username)
+    user = session.exec(statement).first()
+    if not user:
+        raise HTTPException(404, "Account not found")
+    
+    is_password_valid= verify_password(form_data.password, user.password)
+    
+    if not is_password_valid:
+        raise HTTPException(404, "Incorrect password")
+    
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={"sub": user.email}, expires_delta=access_token_expires)
+    return { "access_token": access_token, "token_type":"bearer"}
 
 @router.get("/files")
-async def get_files():
-    client = AsyncBlobClient()
-    files = await client.list_objects(prefix="mrs/")
-    return files
+async def get_files(token: Annotated[str, Depends(oauth2_scheme)]):
+    if token:
+        client = AsyncBlobClient()
+        files = await client.list_objects(prefix="mrs/")
+        return files
+    return { "message": "Resource blocked due to unauthenticated status."}
