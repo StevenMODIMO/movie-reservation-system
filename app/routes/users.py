@@ -6,9 +6,9 @@ from vercel.blob import AsyncBlobClient
 from models.users import User
 from sqlmodel import Session, select
 from dependencies import get_db_session
-from security import hash_password, verify_password, create_access_token
+from security import hash_password, verify_password, create_access_token, get_current_user, oauth2_scheme
 import re
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from config import settings
 from datetime import timedelta
 
@@ -17,7 +17,6 @@ router = APIRouter(tags=["User (authentication and authorization)"], prefix="/ap
 ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp", "image/svg+xml"}
 EMAIL_REGEX = r"^[\w\.-]+@[\w\.-]+\.\w+$"
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/users/login")
 
 def generate_unique_filename(file: UploadFile):
     ext = os.path.splitext(file.filename)[1]
@@ -93,9 +92,13 @@ async def login(
     return { "access_token": access_token, "token_type":"bearer"}
 
 @router.get("/files")
-async def get_files(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_files(token: Annotated[str, Depends(get_current_user)]):
     if token:
         client = AsyncBlobClient()
         files = await client.list_objects(prefix="mrs/")
         return files
     return { "message": "Resource blocked due to unauthenticated status."}
+
+@router.get("/me")
+async def whoami(user: Annotated[User, Depends(get_current_user)]) -> User:
+    return user
