@@ -7,9 +7,9 @@ app = FastAPI()
 def create_db_and_tables():
     Base.metadata.create_all(engine)
 
-# @app.on_event("startup")
-# def on_startup():
-# 	create_db_and_tables()
+@app.on_event("startup")
+def on_startup():
+	create_db_and_tables()
 
 app.include_router(users.router)
 

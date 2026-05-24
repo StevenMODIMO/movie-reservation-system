@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from vercel.blob import AsyncBlobClient
 
-from models.users import User
+from models.users import User, Role, UserRole
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from dependencies import get_db_session
@@ -79,8 +79,23 @@ async def signup(
         avatar_url=avatar_url
         )
     session.add(user)
+    session.flush()
+
+    role = session.execute(select(Role).where(Role.role == "user")).scalar_one_or_none()
+    
+    if not role:
+        role = Role(role="user")
+        session.add(role)
+        session.flush()
+
+    user_role = UserRole(
+        user_id = user.user_id,
+        role_id = role.role_id
+    )
+
+    session.add(user_role)
+
     session.commit()
-    session.refresh(user)
     
     return {
         "message": "Account created successfully"
