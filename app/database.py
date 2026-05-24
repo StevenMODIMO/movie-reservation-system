@@ -1,5 +1,5 @@
-from sqlmodel import create_engine
+from sqlalchemy import create_engine
 from config import settings
-from models import users,movies
+from models import users
 
-engine = create_engine(settings.DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL, echo=True)

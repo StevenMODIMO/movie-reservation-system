@@ -1,28 +1,62 @@
-from sqlmodel import SQLModel, Field
+from typing import List
+from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
-class User(SQLModel, table=True):
+class Base(DeclarativeBase):
+    pass
+
+class User(Base):
     __tablename__ = "users"
-    user_id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
-    email: str = Field(unique=True, nullable=False)
-    password: str
-    username: str
-    avatar_url: str
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+        )
+    email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String)
+    username: Mapped[str] = mapped_column(String)
+    avatar_url: Mapped[str] = mapped_column(String)
 
-class Role(SQLModel, table=True):
+    user_roles: Mapped[List["UserRole"]] =  relationship(
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+class Role(Base):
     __tablename__ = "roles"
-    role_id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
-    role: str = Field(default="user")
+    role_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+        )
+    role: Mapped[str] = mapped_column(String,default="user")
 
-class UserRole(SQLModel, table=True):
+    user_roles: Mapped[List["UserRole"]] = relationship(
+        back_populates="role",
+        cascade="all, delete-orphan"
+    )
+
+class UserRole(Base):
     __tablename__ = "user_roles"
 
-    user_id: uuid.UUID = Field(
-        foreign_key="users.user_id",
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.user_id", ondelete="CASCADE"),
         primary_key=True
     )
 
-    role_id: uuid.UUID = Field(
-        foreign_key="roles.role_id",
+    role_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("roles.role_id", ondelete="CASCADE"),
         primary_key=True
+    )
+
+    user: Mapped["User"] = relationship(
+        back_populates="user_roles"
+    )
+
+    role: Mapped["Role"] = relationship(
+        back_populates="user_roles"
     )
