@@ -1,16 +1,25 @@
-from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
 from typing import Annotated
 import uuid
 import os
-from vercel.blob import AsyncBlobClient
-from models.users import User
-from sqlmodel import Session, select
-from dependencies import get_db_session
-from security import hash_password, verify_password, create_access_token, get_current_user, oauth2_scheme
 import re
+from datetime import timedelta
+
+from vercel.blob import AsyncBlobClient
+
+from models.users import User
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+from dependencies import get_db_session
+from security import (
+    hash_password, 
+    verify_password, 
+    create_access_token, 
+    get_current_user, 
+    oauth2_scheme)
+
+from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from config import settings
-from datetime import timedelta
 
 router = APIRouter(tags=["User (authentication and authorization)"], prefix="/api/users")
 
@@ -33,9 +42,9 @@ async def signup(
     if not re.match(EMAIL_REGEX, email):
         raise HTTPException(400,"Invalid email format")
 
-    existing_user = session.exec(
+    existing_user = session.execute(
     select(User).where(User.email == email)
-    ).first()
+    ).scalar_one_or_none()
 
     if existing_user:
         raise HTTPException(
@@ -63,7 +72,12 @@ async def signup(
 
     hashed_password = hash_password(password)
 
-    user = User(email=email, password=hashed_password, username=username, avatar_url=avatar_url)
+    user = User(
+        email=email, 
+        password=hashed_password, 
+        username=username, 
+        avatar_url=avatar_url
+        )
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -78,7 +92,7 @@ async def login(
     session: Annotated[Session, Depends(get_db_session)]
     ):
     statement = select(User).where(User.email == form_data.username)
-    user = session.exec(statement).first()
+    user = session.execute(statement).scalar_one_or_none()
     if not user:
         raise HTTPException(404, "Account not found")
     
@@ -100,5 +114,5 @@ async def get_files(token: Annotated[str, Depends(get_current_user)]):
     return { "message": "Resource blocked due to unauthenticated status."}
 
 @router.get("/me")
-async def whoami(user: Annotated[User, Depends(get_current_user)]) -> User:
+async def whoami(user: Annotated[User, Depends(get_current_user)]):
     return user

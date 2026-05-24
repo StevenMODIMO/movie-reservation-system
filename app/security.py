@@ -5,7 +5,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from models.users import User
-from sqlmodel import select, Session
+from sqlalchemy.orm import Session
+from sqlalchemy import select
 from fastapi.security import OAuth2PasswordBearer
 from dependencies import get_db_session
 
@@ -52,7 +53,7 @@ def get_current_user(
     except:
         raise credentials_exception
     statement = select(User).where(User.email == token_data)
-    user = session.exec(statement).first()
+    user = session.execute(statement).scalar_one_or_none()
 
     if user is None:
         raise credentials_exception

@@ -1,12 +1,11 @@
 from fastapi import FastAPI
-#from database import engine
 from routes import users
 from database import engine, Base
 
 app = FastAPI()
 
-# def create_db_and_tables():
-#     SQLModel.metadata.create_all(engine)
+def create_db_and_tables():
+    Base.metadata.create_all(engine)
 
 # @app.on_event("startup")
 # def on_startup():
