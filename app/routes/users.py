@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from vercel.blob import AsyncBlobClient
 
-from models.users import User, Role, UserRole
+from models.users import User
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from dependencies import get_db_session
