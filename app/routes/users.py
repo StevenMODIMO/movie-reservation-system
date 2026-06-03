@@ -63,7 +63,7 @@ async def signup(
 
         client = AsyncBlobClient()
         avatar = await client.put(
-            new_filename,
+            f"mrs/profiles/{new_filename}",
             content,
             access="public"
         )
@@ -79,22 +79,6 @@ async def signup(
         avatar_url=avatar_url
         )
     session.add(user)
-    session.flush()
-
-    role = session.execute(select(Role).where(Role.role == "user")).scalar_one_or_none()
-    
-    if not role:
-        role = Role(role="user")
-        session.add(role)
-        session.flush()
-
-    user_role = UserRole(
-        user_id = user.user_id,
-        role_id = role.role_id
-    )
-
-    session.add(user_role)
-
     session.commit()
     
     return {
@@ -124,10 +108,20 @@ async def login(
 async def get_files(token: Annotated[str, Depends(get_current_user)]):
     if token:
         client = AsyncBlobClient()
-        files = await client.list_objects(prefix="mrs/")
+        files = await client.list_objects(prefix="mrs/profiles/")
+        blob_urls = [blob.pathname for blob in files.blobs]
         return files
-    return { "message": "Resource blocked due to unauthenticated status."}
+    return { "message": "Resource blocked."}
 
 @router.get("/me")
 async def whoami(user: Annotated[User, Depends(get_current_user)]):
     return user
+
+@router.delete("/delete-files")
+async def delete_blobs(token: Annotated[str, Depends(get_current_user)]):
+    if token:
+        client = AsyncBlobClient()
+        files = await client.list_objects(prefix="mrs/")
+        deleted_blobs = await client.delete([blob.pathname for blob in files.blobs])
+        return deleted_blobs
+    return { "message": "Resource blocked."}
