@@ -9,13 +9,12 @@ from vercel.blob import AsyncBlobClient
 from models.users import User
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from dependencies import get_db_session
+from dependencies import get_db_session, generate_unique_filename
 from security import (
     hash_password, 
     verify_password, 
     create_access_token, 
-    get_current_user, 
-    oauth2_scheme)
+    get_current_user)
 
 from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
 from fastapi.security import OAuth2PasswordRequestForm
@@ -26,10 +25,6 @@ router = APIRouter(tags=["User (authentication and authorization)"], prefix="/ap
 ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp", "image/svg+xml"}
 EMAIL_REGEX = r"^[\w\.-]+@[\w\.-]+\.\w+$"
 
-
-def generate_unique_filename(file: UploadFile):
-    ext = os.path.splitext(file.filename)[1]
-    return f"{uuid.uuid4()}{ext}"
 
 @router.post("/signup")
 async def signup(
@@ -56,7 +51,7 @@ async def signup(
 
     if file:
         if file.content_type not in ALLOWED_TYPES:
-            raise HTTPException(400, "Invalid file type")
+            raise HTTPException(400, "Unsupported file type")
 
         new_filename = generate_unique_filename(file)
         content = await file.read()
@@ -104,24 +99,24 @@ async def login(
     access_token = create_access_token(data={"sub": user.email}, expires_delta=access_token_expires)
     return { "access_token": access_token, "token_type":"bearer"}
 
-@router.get("/files")
-async def get_files(token: Annotated[str, Depends(get_current_user)]):
-    if token:
-        client = AsyncBlobClient()
-        files = await client.list_objects(prefix="mrs/profiles/")
-        blob_urls = [blob.pathname for blob in files.blobs]
-        return files
-    return { "message": "Resource blocked."}
+# @router.get("/files")
+# async def get_files(token: Annotated[str, Depends(get_current_user)]):
+#     if token:
+#         client = AsyncBlobClient()
+#         files = await client.list_objects(prefix="mrs/profiles/")
+#         blob_urls = [blob.pathname for blob in files.blobs]
+#         return files
+#     return { "message": "Resource blocked."}
 
 @router.get("/me")
 async def whoami(user: Annotated[User, Depends(get_current_user)]):
     return user
 
-@router.delete("/delete-files")
-async def delete_blobs(token: Annotated[str, Depends(get_current_user)]):
-    if token:
-        client = AsyncBlobClient()
-        files = await client.list_objects(prefix="mrs/")
-        deleted_blobs = await client.delete([blob.pathname for blob in files.blobs])
-        return deleted_blobs
-    return { "message": "Resource blocked."}
+# @router.delete("/delete-files")
+# async def delete_blobs(token: Annotated[str, Depends(get_current_user)]):
+#     if token:
+#         client = AsyncBlobClient()
+#         files = await client.list_objects(prefix="mrs/")
+#         deleted_blobs = await client.delete([blob.pathname for blob in files.blobs])
+#         return deleted_blobs
+#     return { "message": "Resource blocked."}
