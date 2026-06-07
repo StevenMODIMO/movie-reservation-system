@@ -7,7 +7,7 @@ from models.movies import Movies, Showtimes, Halls, Seats, Reservations, Reserva
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from dependencies import get_db_session, generate_unique_filename
-from security import get_current_user
+from security import require_role
 
 from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
 
@@ -25,8 +25,10 @@ async def add_movie(
     description: Annotated[str,Form()],
     poster_image: Annotated[UploadFile, File()],
     genre: Annotated[str, Form()],
-    session: Annotated[Session, Depends(get_db_session)]
+    session: Annotated[Session, Depends(get_db_session)],
+    role= Depends(require_role)
 ):
+
     if not title or not description or not genre:
         raise HTTPException(status_code=422, detail="All fields are required")
     

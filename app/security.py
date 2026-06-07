@@ -42,14 +42,11 @@ def get_current_user(
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY,algorithms=[settings.ALGORITHM])
-        print(f"Payload is: {payload}")
         email = payload.get("sub")
-        print(f"Extracted payload: {email}")
 
         if email is None:
             raise credentials_exception
         token_data = email
-        print(f"Current token-data: {token_data}")
     except:
         raise credentials_exception
     statement = select(User).where(User.email == token_data)
@@ -58,3 +55,8 @@ def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+
+def require_role(user: Annotated[User, Depends(get_current_user)]):
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Access not authorized")
