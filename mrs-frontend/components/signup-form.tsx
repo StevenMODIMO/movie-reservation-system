@@ -1,10 +1,21 @@
 "use client";
 import Link from "next/link";
 import { useState, ChangeEvent, FormEvent, useRef } from "react";
-import { Mail, Lock, Diamond, User, Eye, EyeOff, Image, X } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Diamond,
+  User,
+  Eye,
+  EyeOff,
+  Image,
+  X,
+  InfoIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Card,
   CardHeader,
@@ -15,12 +26,16 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import HeroSlider from "./slideshow";
+import { motion, AnimatePresence } from "motion/react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+
+const API = process.env.NEXT_PUBLIC_BACKEND_API_URL as string;
 
 interface FormData {
   email: string;
   password: string;
   username: string;
-  avatar: File | null;
+  file: File | null;
 }
 
 export default function SignupForm() {
@@ -28,8 +43,11 @@ export default function SignupForm() {
     email: "",
     password: "",
     username: "",
-    avatar: null,
+    file: null,
   });
+  const [success, setSuccess] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -47,7 +65,7 @@ export default function SignupForm() {
     if (file) {
       setFormData((prev) => ({
         ...prev,
-        avatar: file,
+        file: file,
       }));
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -66,7 +84,7 @@ export default function SignupForm() {
     setPreviewUrl(null);
     setFormData((prev) => ({
       ...prev,
-      avatar: null,
+      file: null,
     }));
 
     if (fileInputRef.current) {
@@ -74,14 +92,42 @@ export default function SignupForm() {
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted:", {
-      email: formData.email,
-      password: formData.password,
-      username: formData.username,
-      avatar: formData.avatar?.name,
-    });
+    setError(null);
+    setLoading(true);
+    const formdata = new FormData();
+    formdata.append("email", formData.email);
+    formdata.append("password", formData.password);
+    formdata.append("username", formData.username);
+    if (formData.file) formdata.append("file", formData.file);
+
+    try {
+      const response = await fetch(`${API}/api/users/signup`, {
+        method: "POST",
+        body: formdata,
+      });
+      const json = await response.json();
+      if (!response.ok) {
+        setError(json?.detail);
+      } else {
+        setSuccess(json?.message);
+        setFormData({
+          email: "",
+          password: "",
+          username: "",
+          file: null,
+        });
+
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -93,7 +139,64 @@ export default function SignupForm() {
           <CardAction>Get started</CardAction>
         </CardHeader>
         <CardContent>
+          <AnimatePresence initial={false} mode="popLayout">
+            {success && (
+              <motion.div
+                key={success}
+                layout
+                initial={{ opacity: 0, y: -10, scale: 0.98, height: 0 }}
+                animate={{ opacity: 1, y: 0, scale: 1, height: "auto" }}
+                exit={{ opacity: 0, y: -8, scale: 0.98, height: 0 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 520,
+                  damping: 34,
+                  mass: 0.9,
+                  opacity: { duration: 0.16 },
+                  height: { duration: 0.22, ease: "easeInOut" },
+                }}
+                className="overflow-hidden"
+              >
+                <Alert className="gap-2">
+                  <InfoIcon className="mt-0.5 h-4 w-4 shrink-0" />
+                  <div className="space-y-1">
+                    <AlertTitle>Signup completed.</AlertTitle>
+                    <AlertDescription>{success}</AlertDescription>
+                  </div>
+                </Alert>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence initial={false} mode="popLayout">
+            {error && (
+              <motion.div
+                key={error}
+                layout
+                initial={{ opacity: 0, y: -10, scale: 0.98, height: 0 }}
+                animate={{ opacity: 1, y: 0, scale: 1, height: "auto" }}
+                exit={{ opacity: 0, y: -8, scale: 0.98, height: 0 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 520,
+                  damping: 34,
+                  mass: 0.9,
+                  opacity: { duration: 0.16 },
+                  height: { duration: 0.22, ease: "easeInOut" },
+                }}
+                className="overflow-hidden"
+              >
+                <Alert variant="destructive" className="gap-2">
+                  <InfoIcon className="mt-0.5 h-4 w-4 shrink-0" />
+                  <div className="space-y-1">
+                    <AlertTitle>Signup failed</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </div>
+                </Alert>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <form
+            onFocus={() => setError(null)}
             className="space-y-6 w-full max-w-md mx-auto"
             onSubmit={handleSubmit}
           >
@@ -133,8 +236,11 @@ export default function SignupForm() {
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="name@example.com"
                   className="pl-10"
+                  onChange={handleInputChange}
+                  value={formData.email}
                 />
               </div>
             </div>
@@ -162,7 +268,10 @@ export default function SignupForm() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
+                  name="password"
                   className="pl-10"
+                  onChange={handleInputChange}
+                  value={formData.password}
                 />
               </div>
             </div>
@@ -172,16 +281,30 @@ export default function SignupForm() {
               <div className="relative">
                 <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  id="password"
+                  id="username"
                   type="text"
+                  name="username"
                   placeholder="John Smith"
                   className="pl-10"
+                  onChange={handleInputChange}
+                  value={formData.username}
                 />
               </div>
             </div>
 
-            <Button type="submit" className="w-full">
-              Sign Up
+            <Button
+              disabled={loading}
+              type="submit"
+              className="w-full disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <Spinner />
+                  <span>Creating account...</span>
+                </div>
+              ) : (
+                <span>Sign Up</span>
+              )}
             </Button>
           </form>
         </CardContent>

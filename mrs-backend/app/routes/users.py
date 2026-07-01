@@ -28,14 +28,19 @@ EMAIL_REGEX = r"^[\w\.-]+@[\w\.-]+\.\w+$"
 
 @router.post("/signup")
 async def signup(
-    email: Annotated[str, Form()],
-    password: Annotated[str, Form()],
-    username: Annotated[str, Form()],
     session: Annotated[Session, Depends(get_db_session)],
-    file: Annotated[UploadFile | None, File()] = None
+    email: Annotated[str | None, Form()] = None,
+    password: Annotated[str | None, Form()] = None,
+    username: Annotated[str | None, Form()] = None,
+    file: Annotated[UploadFile | None, File()] = None,
     ):
-    if not re.match(EMAIL_REGEX, email):
-        raise HTTPException(400,"Invalid email format.")
+
+    if not email or not password or not username:
+        raise HTTPException(status_code=400, detail="All fields are required.")
+
+    if email and not re.match(EMAIL_REGEX, email):
+        raise HTTPException(400, "Invalid email format.")
+        
 
     existing_user = session.execute(
     select(User).where(User.email == email)
