@@ -79,13 +79,13 @@ export default function SignupForm() {
     console.log("Form submitted:", {
       email: formData.email,
       password: formData.password,
+      username: formData.username,
       avatar: formData.avatar?.name,
     });
   };
 
   return (
     <div className="lg:flex">
-      <HeroSlider />
       <Card className="w-fit mx-4 sm:w-[60%] md:w-[50%] lg:w-[30%] sm:mx-auto">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>

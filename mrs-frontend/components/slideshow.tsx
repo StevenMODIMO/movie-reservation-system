@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const slides = [
   {
@@ -48,13 +48,16 @@ const slides = [
 export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
 
-  const next = () => setCurrent((prev) => (prev + 1) % slides.length);
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 3000);
 
-  const previous = () =>
-    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+    return () => window.clearInterval(interval);
+  }, []);
 
   return (
-    <div className="hidden lg:block lg:relative w-100 h-100 overflow-hidden rounded-xl">
+    <div className="relative h-160 w-135 overflow-hidden rounded-xl">
       <Image
         src={slides[current].src}
         alt={slides[current].alt}
@@ -62,20 +65,6 @@ export default function HeroSlider() {
         priority
         className="object-cover"
       />
-
-      <button
-        onClick={previous}
-        className="absolute left-4 top-1/2 -translate-y-1/2"
-      >
-        ◀
-      </button>
-
-      <button
-        onClick={next}
-        className="absolute right-4 top-1/2 -translate-y-1/2"
-      >
-        ▶
-      </button>
     </div>
   );
 }
