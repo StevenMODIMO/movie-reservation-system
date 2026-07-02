@@ -8,7 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 origins = [
-	"http://localhost:3000"
+	"http://localhost:3000",
+	"https://movie-reservation-system-one.vercel.app"
 ]
 
 app.add_middleware(
