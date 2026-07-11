@@ -7,8 +7,8 @@ export async function login(formData: FormData) {
     const password = formData.get("password")
 try {
     const payload = new FormData()
-    payload.append("username", email)
-    payload.append("password", password)
+    payload.append("username", email!)
+    payload.append("password", password!)
     const res = await fetch(`${API}/api/users/login`, {
         method: "POST",
         body: payload
