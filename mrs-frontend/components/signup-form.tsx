@@ -25,7 +25,6 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import HeroSlider from "./slideshow";
 import { motion, AnimatePresence } from "motion/react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
@@ -235,9 +234,9 @@ export default function SignupForm() {
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="email"
-                  type="email"
+                  type="text"
                   name="email"
-                  placeholder="name@example.com"
+                  placeholder="janedoe@example.com"
                   className="pl-10"
                   onChange={handleInputChange}
                   value={formData.email}
@@ -284,7 +283,7 @@ export default function SignupForm() {
                   id="username"
                   type="text"
                   name="username"
-                  placeholder="John Smith"
+                  placeholder="Jane Doe"
                   className="pl-10"
                   onChange={handleInputChange}
                   value={formData.username}

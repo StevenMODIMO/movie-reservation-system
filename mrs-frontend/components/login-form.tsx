@@ -13,8 +13,13 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { login } from "@/app/actions"
+import { useFormStatus } from 'react-dom'
+import SubmitButton from "./login-button"
 
 export default function LoginForm() {
+  const { pending } = useFormStatus()
+  console.log(pending)
   return (
     <Card className="w-fit mx-4 sm:w-[60%] md:w-[50%] lg:w-[30%] sm:mx-auto">
       <CardHeader>
@@ -23,14 +28,15 @@ export default function LoginForm() {
         <CardAction>Login</CardAction>
       </CardHeader>
       <CardContent>
-        <form className="space-y-6 w-full max-w-md mx-auto">
+        <form action={login} className="space-y-6 w-full max-w-md mx-auto">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="email"
-                type="email"
+                type="text"
+                name="email"
                 placeholder="name@example.com"
                 className="pl-10"
               />
@@ -43,14 +49,16 @@ export default function LoginForm() {
               <Input
                 id="password"
                 type="password"
+                name="password"
                 placeholder="••••••••"
                 className="pl-10"
               />
             </div>
           </div>
-          <Button type="submit" className="w-full">
+          <SubmitButton />
+          {/* <Button type="submit" className="w-full">
             Sign In
-          </Button>
+          </Button> */}
         </form>
       </CardContent>
       <CardFooter className="text-xs flex items-start md:items-center flex-col gap-3">
