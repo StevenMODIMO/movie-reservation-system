@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export default function LogoutButton() {
   return (
     <form action={logout}>
-      <Button type="submit">Sign out</Button>
+      <Button type="submit" className="cursor-pointer">Sign out</Button>
     </form>
   );
 }
