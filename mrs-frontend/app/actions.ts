@@ -44,6 +44,7 @@ export async function login(prevState: LoginState, formData: FormData) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
+      maxAge: 60 * 15,
     });
 
     cookieStore.set("refresh_token", json.refresh_token, {

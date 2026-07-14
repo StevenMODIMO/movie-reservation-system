@@ -5,6 +5,7 @@ import Navbar from "@/components/navbar";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getAuthState } from "@/lib/auth";
+import { api } from "@/lib/api";
 
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" });
 
@@ -58,20 +59,21 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const auth = await getAuthState();
+  const user = await api("/api/users/me");
   return (
     <html
       lang="en"
       className={cn("font-sans", inter.variable, geistHeading.variable)}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col p-4">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar isAuthenticated={auth.isAuthenticated} />
+          <Navbar isAuthenticated={auth.isAuthenticated} user={user} />
           {children}
         </ThemeProvider>
       </body>
