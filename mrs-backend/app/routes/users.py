@@ -42,7 +42,6 @@ async def signup(
     username: Annotated[str | None, Form()] = None,
     file: Annotated[UploadFile | None, File()] = None,
 ):
-
     if not email or not password or not username:
         raise HTTPException(status_code=400, detail="All fields are required.")
 
@@ -87,8 +86,12 @@ async def signup(
     hashed_password = hash_password(password)
 
     user = User(
-        email=email, password=hashed_password, username=username, avatar_url=avatar_url
+        email=email,
+        password=hashed_password,
+        username=username,
+        avatar_url=avatar_url,
     )
+
     session.add(user)
     session.commit()
 
@@ -100,23 +103,22 @@ async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Annotated[Session, Depends(get_db_session)],
 ):
-
     statement = select(User).where(User.email == form_data.username)
     user = session.execute(statement).scalar_one_or_none()
 
     if not user:
         raise HTTPException(404, "Account not found.")
 
-    is_password_valid = verify_password(form_data.password, user.password)
-
-    if not is_password_valid:
+    if not verify_password(form_data.password, user.password):
         raise HTTPException(404, "Incorrect password.")
 
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
+        data={"sub": user.email},
+        expires_delta=timedelta(days=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
+
     refresh_token = create_refresh_token(data={"sub": user.email})
+
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
@@ -126,23 +128,36 @@ async def login(
 
 @router.post("/refresh")
 async def refresh_token(refresh_token: str):
-    payload = jwt.decode(
-        refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-    )
+    try:
+        payload = jwt.decode(
+            refresh_token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+        )
 
-    if payload.get("type") != "refresh":
-        raise HTTPException(status_code=401, detail="Invalid refresh token")
+        if payload.get("type") != "refresh":
+            raise HTTPException(status_code=401, detail="Invalid refresh token.")
 
-    email = payload.get("sub")
+        email = payload.get("sub")
 
-    if not email:
-        raise HTTPException(status_code=401, detail="Invalid refresh token")
+        if not email:
+            raise HTTPException(status_code=401, detail="Invalid refresh token.")
 
-    access_token = create_access_token(
-        data={"sub": email},
-        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
-    )
-    return {"access_token": access_token, "type": "bearer"}
+        access_token = create_access_token(
+            data={"sub": email},
+            expires_delta=timedelta(days=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+        )
+
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+        }
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Refresh token has expired.")
+
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid refresh token.")
 
 
 @router.get("/me")

@@ -1,7 +1,9 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { logout } from "@/app/actions";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
 
 export async function api(path: string) {
   const cookieStore = await cookies();
@@ -15,25 +17,28 @@ export async function api(path: string) {
     const json = await res.json();
 
     if (res.ok) {
-      return json
+      return json;
     }
 
     if (access_token && res.status === 401) {
-      const res = await fetch(`${API_URL}/api/users/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const json = await res.json()
+      console.log(json)
+      return json
+      // const res = await fetch(`${APP_URL}/api/auth/logout`, {
+      //   method: "POST",
+      //   headers: {
+      //     Cookie: cookieStore.toString(),
+      //   },
+      // });
 
-      if(res.ok) {
-        console.log("REFRESH GOOD",json)
-      }
+      // const json = await res.json();
 
-      if(!res.ok) {
-        console.log("REFRESH BAD",json)
-      }
+      // if (res.ok) {
+      //   console.log(json);
+      // }
+
+      // if (!res.ok) {
+      //   console.log(json);
+      // }
     }
   } catch (error) {
     console.log(error);
