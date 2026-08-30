@@ -40,13 +40,9 @@ export default function Navbar({ isAuthenticated, user }: NavbarProps) {
           {user.avatar_url.endsWith("avatar.png") ? (
             <CircleUserRound className="size-9 text-muted-foreground" />
           ) : (
-            <Image
-              src={user.avatar_url}
-              alt={user.username}
-              width={36}
-              height={36}
-              className="rounded-full object-cover"
-            />
+            <div className="relative w-10 h-10">
+              <Image src={user.avatar_url} alt={user.username} fill={true} priority className="rounded-full" />
+            </div>
           )}
 
           <div className="flex flex-col leading-tight">

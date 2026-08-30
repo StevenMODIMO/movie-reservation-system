@@ -1,8 +1,7 @@
 from fastapi import FastAPI
-from routes import users as users_router
-from routes import movies as movie_routers
-from database import engine, Base
-from models import users, movies
+from app.routes import movies as movies_router, users as users_router
+from app.database import engine, Base
+from app.models import users, movies
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -28,7 +27,7 @@ def on_startup():
 	create_db_and_tables()
 
 app.include_router(users_router.router)
-app.include_router(movie_routers.router)
+app.include_router(movies_router.router)
 
 @app.get("/", tags=["Home"])
 def root():

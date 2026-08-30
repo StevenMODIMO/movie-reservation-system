@@ -1,8 +1,8 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import String
 import uuid
-from database import Base
+from app.database import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -16,3 +16,7 @@ class User(Base):
     password: Mapped[str] = mapped_column(String, nullable=False)
     avatar_url: Mapped[str] = mapped_column(String)
     role: Mapped[str] = mapped_column(String, default="user")
+    reservations = relationship(
+        "Reservations",
+        back_populates="user"
+    )

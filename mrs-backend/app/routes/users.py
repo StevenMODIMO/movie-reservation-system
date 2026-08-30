@@ -6,11 +6,11 @@ from datetime import timedelta
 
 from vercel.blob import AsyncBlobClient
 
-from models.users import User
+from app.models.users import User
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from dependencies import get_db_session, generate_unique_filename
-from security import (
+from app.dependencies import get_db_session, generate_unique_filename
+from app.security import (
     hash_password,
     verify_password,
     create_access_token,
@@ -20,7 +20,7 @@ from security import (
 
 from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
 from fastapi.security import OAuth2PasswordRequestForm
-from config import settings
+from app.config import settings
 import jwt
 
 router = APIRouter(
@@ -33,6 +33,10 @@ PASSWORD_REGEX = (
     r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>/?]).{8,}$"
 )
 
+@router.get("/users")
+def get_users(session: Annotated[Session,Depends(get_db_session)]):
+    users = session.execute(select(User)).scalars().all()
+    return users
 
 @router.post("/signup")
 async def signup(
@@ -126,38 +130,38 @@ async def login(
     }
 
 
-@router.post("/refresh")
-async def refresh_token(refresh_token: str):
-    try:
-        payload = jwt.decode(
-            refresh_token,
-            settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM],
-        )
+# @router.post("/refresh")
+# async def refresh_token(refresh_token: str):
+#     try:
+#         payload = jwt.decode(
+#             refresh_token,
+#             settings.SECRET_KEY,
+#             algorithms=[settings.ALGORITHM],
+#         )
 
-        if payload.get("type") != "refresh":
-            raise HTTPException(status_code=401, detail="Invalid refresh token.")
+#         if payload.get("type") != "refresh":
+#             raise HTTPException(status_code=401, detail="Invalid refresh token.")
 
-        email = payload.get("sub")
+#         email = payload.get("sub")
 
-        if not email:
-            raise HTTPException(status_code=401, detail="Invalid refresh token.")
+#         if not email:
+#             raise HTTPException(status_code=401, detail="Invalid refresh token.")
 
-        access_token = create_access_token(
-            data={"sub": email},
-            expires_delta=timedelta(days=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
-        )
+#         access_token = create_access_token(
+#             data={"sub": email},
+#             expires_delta=timedelta(days=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+#         )
 
-        return {
-            "access_token": access_token,
-            "token_type": "bearer",
-        }
+#         return {
+#             "access_token": access_token,
+#             "token_type": "bearer",
+#         }
 
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Refresh token has expired.")
+#     except jwt.ExpiredSignatureError:
+#         raise HTTPException(status_code=401, detail="Refresh token has expired.")
 
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid refresh token.")
+#     except jwt.InvalidTokenError:
+#         raise HTTPException(status_code=401, detail="Invalid refresh token.")
 
 
 @router.get("/me")

@@ -1,14 +1,14 @@
 from pwdlib import PasswordHash
-from config import settings
+from app.config import settings
 import jwt
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
-from models.users import User
+from app.models.users import User
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from fastapi.security import OAuth2PasswordBearer
-from dependencies import get_db_session
+from app.dependencies import get_db_session
 
 password_hash = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/users/login")

@@ -17,7 +17,7 @@ export default function PrivacyPolicy() {
         <h1 className="text-3xl font-bold tracking-tight">
           Privacy Policy for Our Movie Reservation System
         </h1>
-        <p className="text-muted-foreground">Last updated: June 30, 2026</p>
+        <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
       </div>
 
       <Separator />

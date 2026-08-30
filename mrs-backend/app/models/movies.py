@@ -1,6 +1,5 @@
-from database import Base
+from app.database import Base
 import uuid
-
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, ForeignKey, DateTime, Numeric, UniqueConstraint
@@ -19,7 +18,6 @@ class Movies(Base):
     description: Mapped[str] = mapped_column(String, nullable=False)
     poster_image: Mapped[str] = mapped_column(String, nullable=False)
     genre: Mapped[str] = mapped_column(String, nullable=False)
-
     showtimes = relationship("Showtimes", back_populates="movie", cascade="all, delete-orphan")
 
 
@@ -88,7 +86,7 @@ class Seats(Base):
     hall_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("halls.hall_id")
     )
-    seat_label: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    seat_label: Mapped[str] = mapped_column(String, nullable=False)
 
     __table_args__ = (
         UniqueConstraint("hall_id", "seat_label", name="unique_seat_per_hall"),
@@ -107,6 +105,10 @@ class Reservations(Base):
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.user_id")
+    )
+    user = relationship(
+        "User",
+        back_populates="reservations"
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -135,6 +137,3 @@ class ReservationSeats(Base):
         ForeignKey("seats.seat_id"),
         primary_key=True
     )
-    __table_args__ = (
-        UniqueConstraint("reservation_id", "seat_id", name="unique_reservation_seat"),
-        )
