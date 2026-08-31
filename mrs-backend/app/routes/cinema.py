@@ -1,0 +1,17 @@
+from typing import Annotated
+from app.models.cinema import Halls
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+from app.dependencies import get_db_session
+from app.security import require_role
+
+from fastapi import APIRouter,Depends
+
+router = APIRouter(tags=["Cinema Management."], prefix="/api/mrs/cinema")
+
+# Get all halls
+@router.get("/get-halls")
+async def get_halls(session: Annotated[Session, Depends(get_db_session)], role=Depends):
+    statement = select(Halls)
+    halls = session.execute(statement).scalars().all()
+    return halls

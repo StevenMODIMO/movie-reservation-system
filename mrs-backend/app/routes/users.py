@@ -24,7 +24,7 @@ from app.config import settings
 import jwt
 
 router = APIRouter(
-    tags=["User (authentication and authorization)"], prefix="/api/users"
+    tags=["User Management."], prefix="/api/users"
 )
 
 ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp", "image/svg+xml"}
