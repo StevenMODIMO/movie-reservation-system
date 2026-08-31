@@ -1,11 +1,7 @@
-from datetime import datetime, timedelta, timezone
+import sys
 
-d = datetime.now()
-d1hr = d + timedelta(hours=1)
+d = dir(sys)
 
-movie_duration = timedelta(hours=1)
 
-# if d < movie_duration:
-#     print(True)
-# else:
-#     print(False)
+for i in d:
+    print(i)
