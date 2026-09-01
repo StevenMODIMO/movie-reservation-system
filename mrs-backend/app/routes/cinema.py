@@ -11,7 +11,7 @@ router = APIRouter(tags=["Cinema Management."], prefix="/api/mrs/cinema")
 
 # Get all halls
 @router.get("/get-halls")
-async def get_halls(session: Annotated[Session, Depends(get_db_session)], role=Depends):
+async def get_halls(session: Annotated[Session, Depends(get_db_session)]):
     statement = select(Halls)
     halls = session.execute(statement).scalars().all()
     return halls
