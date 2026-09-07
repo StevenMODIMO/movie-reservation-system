@@ -23,9 +23,17 @@ export default function Navbar({ isAuthenticated, user }: NavbarProps) {
     <nav className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         {isAuthenticated ? (
-          <>
-            <Link href="/browse">Browse</Link>
-          </>
+          <div>
+            {user?.role === "user" ? (
+              <div>
+                <Link href="/browse">Browse</Link>
+              </div>
+            ) : (
+              <div>
+                <Link href="/manage">Overview</Link>
+              </div>
+            )}
+          </div>
         ) : (
           <>
             <Link href="/">Home</Link>
@@ -41,7 +49,14 @@ export default function Navbar({ isAuthenticated, user }: NavbarProps) {
             <CircleUserRound className="size-9 text-muted-foreground" />
           ) : (
             <div className="relative w-10 h-10">
-              <Image src={user.avatar_url} alt={user.username} fill={true} priority className="rounded-full" />
+              <Image
+                src={user.avatar_url}
+                alt={user.username}
+                fill={true}
+                priority
+                className="rounded-full"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
             </div>
           )}
 

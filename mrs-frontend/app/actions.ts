@@ -54,6 +54,14 @@ export async function login(prevState: LoginState, formData: FormData) {
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
+
+    cookieStore.set("role", json.role, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30
+    })
   } catch (error) {
     return {
       success: false,
@@ -61,7 +69,7 @@ export async function login(prevState: LoginState, formData: FormData) {
     };
   }
 
-  redirect("/browse");
+  redirect("/redirect");
 }
 
 
