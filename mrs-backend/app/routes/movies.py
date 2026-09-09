@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from app.dependencies import get_db_session, generate_unique_filename
-from app.security import require_role
+from app.security import require_role, get_current_user
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
@@ -18,12 +18,14 @@ ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp", "image/svg+xml"}
 
 # Get all movies
 @router.get("/get-all-movies")
-async def get_movies(session: Annotated[Session, Depends(get_db_session)]):
+async def get_movies(
+    session: Annotated[Session, Depends(get_db_session)], user=Depends(get_current_user)
+):
     movies = session.execute(select(Movies)).scalars().all()
     return movies
 
 
-#Get a single movie by id
+# Get a single movie by id
 @router.get("/{movie_id}")
 async def get_single_movie(
     movie_id: str, session: Annotated[Session, Depends(get_db_session)]

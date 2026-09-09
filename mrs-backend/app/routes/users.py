@@ -7,7 +7,9 @@ from datetime import timedelta
 from vercel.blob import AsyncBlobClient
 
 from app.models.users import User
-from sqlalchemy.orm import Session
+from app.models.reservations import Reservations
+from app.models.movies import Showtimes, Movies
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
 from app.dependencies import get_db_session, generate_unique_filename
 from app.security import (
@@ -21,11 +23,8 @@ from app.security import (
 from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from app.config import settings
-import jwt
 
-router = APIRouter(
-    tags=["User Management."], prefix="/api/users"
-)
+router = APIRouter(tags=["User Management."], prefix="/api/users")
 
 ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp", "image/svg+xml"}
 EMAIL_REGEX = r"^[\w\.-]+@[\w\.-]+\.\w+$"
@@ -33,10 +32,12 @@ PASSWORD_REGEX = (
     r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>/?]).{8,}$"
 )
 
-@router.get("/users")
-def get_users(session: Annotated[Session,Depends(get_db_session)]):
+
+@router.get("/get-all-users")
+def get_users(session: Annotated[Session, Depends(get_db_session)]):
     users = session.execute(select(User)).scalars().all()
     return users
+
 
 @router.post("/signup")
 async def signup(
@@ -126,8 +127,22 @@ async def login(
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
+        "role": user.role,
         "token_type": "bearer",
     }
+
+
+@router.get("/my-reservations")
+def my_reservations(
+    session: Annotated[Session, Depends(get_db_session)],
+    user: Annotated[User, Depends(get_current_user)],
+):
+    stmt = (
+        select(Reservations).options(selectinload(Reservations.showtime).selectinload(Showtimes.movie))
+        .where(Reservations.user_id == user.user_id)
+    )
+    user_reservations = session.execute(stmt).scalars().all()
+    return user_reservations
 
 
 # @router.post("/refresh")
