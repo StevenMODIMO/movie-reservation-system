@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getAuthState } from "@/lib/auth";
 import { api } from "@/lib/api";
+import ProgressBarProvider from "@/components/progress-bar";
 
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" });
 
@@ -66,15 +67,17 @@ export default async function RootLayout({
       className={cn("font-sans", inter.variable, geistHeading.variable)}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col p-4">
+      <body className="min-h-full p-4">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar isAuthenticated={auth.isAuthenticated} user={user} />
-          {children}
+          <div className="flex flex-col gap-3">
+            <Navbar isAuthenticated={auth.isAuthenticated} user={user} />
+            <ProgressBarProvider>{children}</ProgressBarProvider>
+          </div>
         </ThemeProvider>
       </body>
     </html>

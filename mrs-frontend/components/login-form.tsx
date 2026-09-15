@@ -28,9 +28,9 @@ export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(login, initialState);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setError(state.error);
-  }, [state.error]);
+  // useEffect(() => {
+  //   setError(state.error);
+  // }, [state.error]);
 
   return (
     <Card className="w-fit mx-4 sm:w-[60%] md:w-[50%] lg:w-[30%] sm:mx-auto">

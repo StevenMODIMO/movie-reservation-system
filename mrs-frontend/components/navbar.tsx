@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { CircleUserRound } from "lucide-react";
+import { CircleUserRound, Dot } from "lucide-react";
 import LogoutButton from "./logout-button";
 
 type User = {
@@ -24,15 +24,10 @@ export default function Navbar({ isAuthenticated, user }: NavbarProps) {
       <div className="flex items-center gap-3">
         {isAuthenticated ? (
           <div>
-            {user?.role === "user" ? (
-              <div>
-                <Link href="/browse">Browse</Link>
-              </div>
-            ) : (
-              <div>
-                <Link href="/manage">Overview</Link>
-              </div>
-            )}
+            {/* <div className="flex items-center gap-2 dark:bg-black/90 p-1 rounded">
+              <Dot className="text-green-500 animate-ping" size={24} />
+              <p className="text-xs">System Status: Good</p>
+            </div> */}
           </div>
         ) : (
           <>

@@ -78,6 +78,7 @@ export async function logout() {
 
   cookieStore.delete("access_token");
   cookieStore.delete("refresh_token");
+  cookieStore.delete("role")
 
   redirect("/login");
 }
