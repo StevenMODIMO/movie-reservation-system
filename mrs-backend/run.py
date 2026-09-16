@@ -1,7 +1,3 @@
-import sys
+from pathlib import Path
 
-d = dir(sys)
-
-
-for i in d:
-    print(i)
+new_dir = Path.rmdir("test")

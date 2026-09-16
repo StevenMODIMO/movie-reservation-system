@@ -12,9 +12,22 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupAction,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+  SidebarMenuBadge,
 } from "@/components/ui/sidebar";
 
-import { Target } from "lucide-react";
+import {
+  Target,
+  Film,
+  TvMinimalPlay,
+  Users,
+  Armchair,
+  ChartNoAxesCombined,
+  TicketCheck,
+  Bolt,
+} from "lucide-react";
 
 export default function AdminNavbar() {
   return (
@@ -27,13 +40,12 @@ export default function AdminNavbar() {
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Overview</SidebarGroupLabel>
-            <SidebarGroupAction>stuff</SidebarGroupAction>
+            {/* <SidebarGroupAction>stuff</SidebarGroupAction> */}
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/mrsai/">
                     <Target />
-
                     <span>Overview</span>
                   </Link>
                 </SidebarMenuButton>
@@ -44,19 +56,44 @@ export default function AdminNavbar() {
             <SidebarGroupLabel>Management</SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/mrsai/movies">Movies</Link>
+                <SidebarMenuButton asChild>
+                  <Link href="/mrsai/movies">
+                    <Film />
+                    <span>Movies</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/mrsai/showtimes">Showtimes</Link>
+                <SidebarMenuButton asChild>
+                  <Link href="/mrsai/showtimes">
+                    <TvMinimalPlay />
+                    <span>Showtimes</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/mrsai/reservations">Reservations</Link>
+                <SidebarMenuButton asChild>
+                  <Link href="/mrsai/reservations">
+                    <TicketCheck />
+                    <span>Reservations</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/mrsai/users">Users</Link>
+                <SidebarMenuButton asChild>
+                  <Link href="/mrsai/users">
+                    <Users />
+                    <span>Users</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/mrsai/cinema">Halls & Seats</Link>
+                <SidebarMenuButton asChild>
+                  <Link href="/mrsai/cinema">
+                    <Armchair />
+                    <span>Halls & Seats</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
@@ -64,7 +101,12 @@ export default function AdminNavbar() {
             <SidebarGroupLabel>Reporting</SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/mrsai/revenue">Revenue</Link>
+                <SidebarMenuButton asChild>
+                  <Link href="/mrsai/revenue">
+                    <ChartNoAxesCombined />
+                    <span>Revenue</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
@@ -72,7 +114,21 @@ export default function AdminNavbar() {
             <SidebarGroupLabel>System</SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/mrsai/setup">Setup</Link>
+                <SidebarMenuButton asChild>
+                  <Link href="/mrsai/setup">
+                    <Bolt />
+                    <span>Setup</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton />
+                <SidebarMenuBadge>24</SidebarMenuBadge>
+                <SidebarMenuSub>
+                  <SidebarMenuSubItem>
+                    <SidebarMenuSubButton />
+                  </SidebarMenuSubItem>
+                </SidebarMenuSub>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
