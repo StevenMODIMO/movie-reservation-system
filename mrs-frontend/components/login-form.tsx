@@ -28,9 +28,7 @@ export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(login, initialState);
   const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   setError(state.error);
-  // }, [state.error]);
+  
 
   return (
     <Card className="w-fit mx-4 sm:w-[60%] md:w-[50%] lg:w-[30%] sm:mx-auto">
@@ -41,7 +39,7 @@ export default function LoginForm() {
       </CardHeader>
       <CardContent>
         <AnimatePresence initial={false} mode="popLayout">
-          {error && (
+          {state.error && (
             <motion.div
               key={state.error}
               layout
@@ -102,7 +100,7 @@ export default function LoginForm() {
           <Button
             disabled={isPending}
             type="submit"
-            className="w-full disabled:cursor-not-allowed cursor-pointer"
+            className="block w-fit mx-auto disabled:cursor-not-allowed cursor-pointer"
           >
             {isPending ? (
               <div className="flex items-center gap-2">

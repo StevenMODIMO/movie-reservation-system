@@ -60,24 +60,22 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const auth = await getAuthState();
-  const user = await api("/api/users/me");
+  const {data } = await api<any>("/api/users/me");
   return (
     <html
       lang="en"
       className={cn("font-sans", inter.variable, geistHeading.variable)}
       suppressHydrationWarning
     >
-      <body className="min-h-full p-4">
+      <body className="min-h-screen">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex flex-col gap-3">
-            <Navbar isAuthenticated={auth.isAuthenticated} user={user} />
-            <ProgressBarProvider>{children}</ProgressBarProvider>
-          </div>
+          <Navbar isAuthenticated={auth.isAuthenticated} />
+          <ProgressBarProvider>{children}</ProgressBarProvider>
         </ThemeProvider>
       </body>
     </html>

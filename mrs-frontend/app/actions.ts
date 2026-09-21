@@ -33,7 +33,7 @@ export async function login(prevState: LoginState, formData: FormData) {
     if (!res.ok) {
       return {
         success: false,
-        error: json.detail ?? "Login failed",
+        error: json.detail,
       };
     }
 

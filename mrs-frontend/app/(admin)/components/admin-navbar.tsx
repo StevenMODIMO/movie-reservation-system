@@ -27,17 +27,43 @@ import {
   ChartNoAxesCombined,
   TicketCheck,
   Bolt,
+  MonitorCog,
 } from "lucide-react";
 
-export default function AdminNavbar() {
+import CustomTrigger from "./trigger";
+
+type User = {
+  user_id: string;
+  username: string;
+  email: string;
+  role: string;
+  avatar_url: string;
+};
+
+type NavbarProps = {
+  isAuthenticated: boolean;
+  user: User | null;
+};
+
+import { usePathname } from "next/navigation";
+
+export default function AdminNavbar({isAuthenticated, user}: NavbarProps) {
+  const pathname = usePathname();
   return (
     <div className="flex flex-col items-start gap-4 w-[10%]">
       {/* <Link href="/mrsai/">Overview</Link>
       <Link href="/mrsai/revenue">Revenue</Link>
       <Link href="/mrsai/setup">Setup</Link> */}
       <Sidebar collapsible="icon">
-        <SidebarHeader>Steven</SidebarHeader>
+        {/* <SidebarHeader>
+          <MonitorCog />
+          <CustomTrigger />
+          <span>Steven</span>
+        </SidebarHeader> */}
         <SidebarContent>
+          <SidebarGroup>
+            <CustomTrigger />
+          </SidebarGroup>
           <SidebarGroup>
             <SidebarGroupLabel>Overview</SidebarGroupLabel>
             {/* <SidebarGroupAction>stuff</SidebarGroupAction> */}
@@ -121,19 +147,10 @@ export default function AdminNavbar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton />
-                <SidebarMenuBadge>24</SidebarMenuBadge>
-                <SidebarMenuSub>
-                  <SidebarMenuSubItem>
-                    <SidebarMenuSubButton />
-                  </SidebarMenuSubItem>
-                </SidebarMenuSub>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter>Modimo</SidebarFooter>
+        {/* <SidebarFooter>Modimo</SidebarFooter> */}
       </Sidebar>
     </div>
   );

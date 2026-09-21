@@ -294,7 +294,7 @@ export default function SignupForm() {
             <Button
               disabled={loading}
               type="submit"
-              className="w-full disabled:cursor-not-allowed cursor-pointer"
+              className="block w-fit mx-auto disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
