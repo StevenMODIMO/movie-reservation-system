@@ -60,7 +60,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const auth = await getAuthState();
-  const {data } = await api<any>("/api/users/me");
+  const { data } = await api<any>("/api/users/me");
   return (
     <html
       lang="en"

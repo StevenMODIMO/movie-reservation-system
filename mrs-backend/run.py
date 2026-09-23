@@ -1,3 +1,5 @@
-from pathlib import Path
+import uuid
 
-new_dir = Path.rmdir("test")
+id = uuid.uuid4()
+
+print(id)

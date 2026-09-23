@@ -17,7 +17,7 @@ from app.security import (
     verify_password,
     create_access_token,
     create_refresh_token,
-    get_current_user,
+    get_current_user,require_role
 )
 
 from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
@@ -34,8 +34,8 @@ PASSWORD_REGEX = (
 
 
 @router.get("/get-all-users")
-def get_users(session: Annotated[Session, Depends(get_db_session)]):
-    users = session.execute(select(User)).scalars().all()
+def get_users(session: Annotated[Session, Depends(get_db_session)], role=Depends(require_role)):
+    users = session.execute(select(User).where(User.role == "user")).scalars().all()
     return users
 
 
