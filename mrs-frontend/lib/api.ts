@@ -47,12 +47,15 @@ export async function api<T>(
   }
 
   const method = options.method ?? "GET";
+  const isFormData = options.body instanceof FormData;
 
   try {
     const res = await fetch(`${API_URL}${path}`, {
       method,
       headers: {
-        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...(options.body && !isFormData
+          ? { "Content-Type": "application/json" }
+          : {}),
         ...options.headers,
         Authorization: `Bearer ${accessToken}`,
       },

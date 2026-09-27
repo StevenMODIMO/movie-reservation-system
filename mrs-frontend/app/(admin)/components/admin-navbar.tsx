@@ -32,7 +32,6 @@ import {
   MonitorCog,
 } from "lucide-react";
 
-import CustomTrigger from "./trigger";
 
 type User = {
   user_id: string;
@@ -56,9 +55,6 @@ export default function AdminNavbar({ isAuthenticated, user }: NavbarProps) {
     <div className="flex flex-col items-start gap-4 w-[10%]">
       <Sidebar collapsible="icon">
         <SidebarContent>
-          <SidebarGroup>
-            <CustomTrigger />
-          </SidebarGroup>
           <SidebarGroup>
             <SidebarGroupLabel>Overview</SidebarGroupLabel>
             <SidebarMenu>

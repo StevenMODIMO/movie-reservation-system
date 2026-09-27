@@ -24,7 +24,7 @@ export default async function RootLayout({
       <AdminNavbar isAuthenticated={auth.isAuthenticated} user={data} />
 
       <SidebarInset>
-        <main className="w-full p-8">
+        <main className="w-full lg:p-4">
           <CustomTrigger />
           {children}
         </main>
