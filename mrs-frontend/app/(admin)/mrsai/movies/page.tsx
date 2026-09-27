@@ -20,7 +20,11 @@ interface Movie {
 
 export default async function Movies() {
   //await new Promise((resolve) => setTimeout(resolve, 30000));
-  const movies = await api<Movie[]>("/api/mrs/movies/get-all-movies");
+  const movies = await api<Movie[]>("/api/mrs/movies/get-all-movies", {
+    next: {
+      tags: ["movies"],
+    },
+  });
   return (
     <div className="flex flex-col gap-3">
       {/* <header className="flex justify-end">
@@ -31,7 +35,7 @@ export default async function Movies() {
       <AddMovieForm />
       <div className="pt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-[200_px,200_px] xl:grid-cols-4">
         {movies.data?.map((movie) => (
-          <Card key={movie.movie_id}  className="p-0">
+          <Card key={movie.movie_id} className="p-0">
             <div className="relative w-full h-36">
               <Image
                 src={movie.poster_image}

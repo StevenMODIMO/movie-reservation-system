@@ -24,11 +24,13 @@ type ApiResponse<T> =
       status: number;
     };
 
+type RequestBody = Record<string, unknown> | FormData;
+
 export async function api<T>(
   path: string,
   options: {
     method?: HttpMethod;
-    body?: unknown;
+    body?: RequestBody;
     headers?: HeadersInit;
     cache?: RequestCache;
     next?: NextFetchRequestConfig;
@@ -49,6 +51,14 @@ export async function api<T>(
   const method = options.method ?? "GET";
   const isFormData = options.body instanceof FormData;
 
+  let requestBody: BodyInit | undefined;
+
+  if (options.body instanceof FormData) {
+    requestBody = options.body;
+  } else if (options.body) {
+    requestBody = JSON.stringify(options.body);
+  }
+
   try {
     const res = await fetch(`${API_URL}${path}`, {
       method,
@@ -59,7 +69,7 @@ export async function api<T>(
         ...options.headers,
         Authorization: `Bearer ${accessToken}`,
       },
-      body: options.body ? JSON.stringify(options.body) : undefined,
+      body: requestBody,
       cache: options.cache,
       next: options.next,
     });

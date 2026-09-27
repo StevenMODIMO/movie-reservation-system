@@ -1,10 +1,18 @@
 "use server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { api } from "@/lib/api";
+import { revalidateTag, revalidatePath } from "next/cache";
 
 type LoginState = {
   success: boolean;
   error: string | null;
+};
+
+type MovieState = {
+  data: unknown;
+  error: string | null;
+  status: number | null;
 };
 
 const API = process.env.NEXT_PUBLIC_BACKEND_API_URL;
@@ -60,8 +68,8 @@ export async function login(prevState: LoginState, formData: FormData) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 30
-    })
+      maxAge: 60 * 60 * 24 * 30,
+    });
   } catch (error) {
     return {
       success: false,
@@ -72,13 +80,28 @@ export async function login(prevState: LoginState, formData: FormData) {
   redirect("/redirect");
 }
 
-
 export async function logout() {
   const cookieStore = await cookies();
 
   cookieStore.delete("access_token");
   cookieStore.delete("refresh_token");
-  cookieStore.delete("role")
+  cookieStore.delete("role");
 
   redirect("/login");
+}
+
+// MOVIE ACTIONS
+export async function addMovie(prevState: MovieState, formData: FormData) {
+  const response = await api("/api/mrs/movies/add-movie", {
+    method: "POST",
+    body: formData,
+  });
+  if (response.error) {
+    return response;
+  }
+
+  revalidateTag("movies", "max");
+  revalidatePath("/mrsai/movies");
+
+  return response;
 }
