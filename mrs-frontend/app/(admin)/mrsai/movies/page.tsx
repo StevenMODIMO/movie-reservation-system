@@ -3,7 +3,7 @@ import { api } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import MovieOptions from "../../components/movie-options";
 import AddMovieForm from "../../components/add-movie-form";
 
 export const metadata: Metadata = {
@@ -27,11 +27,6 @@ export default async function Movies() {
   });
   return (
     <div className="flex flex-col gap-3">
-      {/* <header className="flex justify-end">
-        <Button asChild size="xs">
-          <Link href="/mrsai/movies/new">New movie</Link>
-        </Button>
-      </header> */}
       <AddMovieForm />
       <div className="pt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-[200_px,200_px] xl:grid-cols-4">
         {movies.data?.map((movie) => (
@@ -44,6 +39,7 @@ export default async function Movies() {
                 className="object-cover"
               />
             </div>
+            <MovieOptions movie={movie} />
 
             <CardHeader className="px-2 py-3">
               <CardTitle className="line-clamp-1 dark:text-primary">

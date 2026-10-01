@@ -105,3 +105,27 @@ export async function addMovie(prevState: MovieState, formData: FormData) {
 
   return response;
 }
+
+export async function editMovie(
+  prevState: MovieState,
+  formData: FormData,
+  movieId: string,
+) {
+  const response = await api(`/api/mrs/movies/update-movie/${movieId}`, {
+    method: "PUT",
+    body: formData,
+  });
+
+  if (response.error) return response;
+
+  revalidateTag("movies", "max");
+  revalidatePath("/mrsai/movies");
+
+  return response;
+}
+
+export async function deleteMovie(movieId: string) {
+  return await api(`/api/mrs/movies/delete-movie/${movieId}`, {
+    method: "DELETE",
+  });
+}
