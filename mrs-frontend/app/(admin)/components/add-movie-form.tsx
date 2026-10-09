@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState, useEffect } from "react";
+import { useState, useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-
+import { Textarea } from "@/components/ui/textarea"
 import {
   Sheet,
   SheetContent,
@@ -45,14 +45,15 @@ interface MovieFormData {
 }
 
 export default function AddMovieForm() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
   const [formData, setFormData] = useState<MovieFormData>({
     title: "",
     description: "",
     genre: "",
     poster_image: null,
   });
-
+  const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(
@@ -61,10 +62,22 @@ export default function AddMovieForm() {
   );
 
   useEffect(() => {
-    if (state?.error === null && state?.data) {
+    if (state.status === 200 && state.data) {
+      setPreview(null);
+      setOpen(false);
       router.refresh();
     }
   }, [state, router]);
+
+  const [showError, setShowError] = useState(true);
+
+  useEffect(() => {
+    if (state.error) {
+      setShowError(true);
+    }
+  }, [state]);
+
+  const clearError = () => setShowError(false);
 
   return (
     <div>
@@ -90,7 +103,11 @@ export default function AddMovieForm() {
             </CardHeader>
 
             <CardContent>
-              <form action={formAction} className="flex flex-col gap-4">
+              <form
+                action={formAction}
+                className="flex flex-col gap-4"
+                onFocus={clearError}
+              >
                 <Label className="flex flex-col items-start gap-2">
                   {preview && (
                     <div>
@@ -99,16 +116,14 @@ export default function AddMovieForm() {
                         alt="image-preview"
                         className="w-24 h-24 mx-auto p-2 rounded-full border-2 object-cover object-center"
                       />
-
                       <Button
                         type="button"
                         onClick={() => {
-                          setPreview(null);
+                          if (fileRef.current) {
+                            fileRef.current.value = "";
+                          }
 
-                          setFormData((prev) => ({
-                            ...prev,
-                            poster_image: null,
-                          }));
+                          setPreview(null);
                         }}
                       >
                         Remove Image
@@ -117,6 +132,7 @@ export default function AddMovieForm() {
                   )}
 
                   <Input
+                    ref={fileRef}
                     type="file"
                     name="poster_image"
                     accept="image/*"
@@ -148,8 +164,7 @@ export default function AddMovieForm() {
                 <Label className="flex flex-col items-start gap-2">
                   <span>Description</span>
 
-                  <Input
-                    type="text"
+                  <Textarea
                     name="description"
                     placeholder="Lorem ipsum dolor sit amet."
                   />
@@ -161,10 +176,9 @@ export default function AddMovieForm() {
                   <Input type="text" name="genre" placeholder="Action/Sci-Fi" />
                 </Label>
 
-                {state.error && (
+                {state.error && showError && (
                   <p className="text-sm text-red-500">{state.error}</p>
                 )}
-
                 {state.status === 201 && (
                   <p className="text-sm text-green-500">
                     Movie added successfully.

@@ -39,12 +39,12 @@ async def get_single_movie(
 # Add new movie
 @router.post("/add-movie")
 async def add_movie(
-    title: Annotated[str, Form()],
-    description: Annotated[str, Form()],
-    poster_image: Annotated[UploadFile, File()],
-    genre: Annotated[str, Form()],
     session: Annotated[Session, Depends(get_db_session)],
     role=Depends(require_role),
+    title: Annotated[str | None, Form()] = None,
+    description: Annotated[str | None, Form()] = None,
+    poster_image: Annotated[UploadFile |  None, File()] = None,
+    genre: Annotated[str | None, Form()] = None,
 ):
 
     if not title or not description or not genre:

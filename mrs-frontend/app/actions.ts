@@ -96,6 +96,7 @@ export async function addMovie(prevState: MovieState, formData: FormData) {
     method: "POST",
     body: formData,
   });
+  console.log("ADD MOVIE RESPONSE: ", response);
   if (response.error) {
     return response;
   }
