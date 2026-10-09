@@ -111,6 +111,9 @@ async def update_movie(
         movie.genre = genre
 
     if poster_image:
+        print("Filename:", poster_image.filename)
+        print("Content type:", poster_image.content_type)
+        print("Allowed types:", ALLOWED_TYPES)
         if poster_image.content_type not in ALLOWED_TYPES:
             raise HTTPException(status_code=400, detail="Unsupported file type")
 

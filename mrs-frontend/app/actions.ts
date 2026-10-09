@@ -107,11 +107,15 @@ export async function addMovie(prevState: MovieState, formData: FormData) {
   return response;
 }
 
-export async function editMovie(
-  prevState: MovieState,
-  formData: FormData,
-  movieId: string,
-) {
+export async function editMovie(prevState: MovieState, formData: FormData) {
+  const movieId = formData.get("movie_id");
+
+  const poster = formData.get("poster_image");
+
+  // Don't upload an empty file when no replacement was selected.
+  if (poster instanceof File && poster.size === 0) {
+    formData.delete("poster_image");
+  }
   const response = await api(`/api/mrs/movies/update-movie/${movieId}`, {
     method: "PUT",
     body: formData,
