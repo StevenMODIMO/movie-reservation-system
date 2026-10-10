@@ -15,7 +15,7 @@ type MovieState = {
   status: number | null;
 };
 
-const API = process.env.NEXT_PUBLIC_BACKEND_API_URL;
+const API = process.env.NEXT_BACKEND_API_URL;
 
 export async function login(prevState: LoginState, formData: FormData) {
   const email = formData.get("email");

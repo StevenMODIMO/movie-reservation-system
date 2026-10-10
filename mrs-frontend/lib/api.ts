@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
+const API_URL = process.env.NEXT_BACKEND_API_URL;
 
 type HttpMethod =
   | "GET"
