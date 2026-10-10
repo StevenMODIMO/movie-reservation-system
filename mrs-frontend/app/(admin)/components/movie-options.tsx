@@ -12,6 +12,7 @@ import {
 import EditMovieForm from "./edit-movie-form";
 import DeleteMovieDialog from "./delete-movie-dialog";
 import AssignShowtimes from "./assign-showtimes";
+import MovieOverview from "./movie-overview";
 import { useState } from "react";
 
 interface Movie {
@@ -30,6 +31,7 @@ export default function MovieOptions({ movie }: MovieOptionsProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showtimeOpen, setShowtimeOpen] = useState(false);
+  const [overviewOpen, setOverviewOpen] = useState(false);
   return (
     <>
       <DropdownMenu>
@@ -39,6 +41,10 @@ export default function MovieOptions({ movie }: MovieOptionsProps) {
         <DropdownMenuContent align="center">
           <DropdownMenuGroup>
             <DropdownMenuLabel>Manage</DropdownMenuLabel>
+            <DropdownMenuItem onSelect={() => setOverviewOpen(true)}>
+              <Pencil />
+              Overview
+            </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => setEditOpen(true)}>
               <Pencil />
               Edit
@@ -66,6 +72,11 @@ export default function MovieOptions({ movie }: MovieOptionsProps) {
         movieId={movie.movie_id}
         open={showtimeOpen}
         onOpenChange={setShowtimeOpen}
+      />
+      <MovieOverview
+        movie={movie}
+        open={overviewOpen}
+        onOpenChange={setOverviewOpen}
       />
     </>
   );
