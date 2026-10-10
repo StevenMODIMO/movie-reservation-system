@@ -69,7 +69,7 @@ export default function HallLayout({ halls }: HallLayoutProps) {
                   {seat.seat_label}
                 </div>
               ))}
-            </div>
+            </div>                  
 
             <p className="mt-4 text-center text-xs text-muted-foreground">
               Read-only seat layout
