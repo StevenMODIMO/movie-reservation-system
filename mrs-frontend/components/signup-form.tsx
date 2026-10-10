@@ -28,7 +28,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
-const API = process.env.NEXT_PUBLIC_BACKEND_API_URL as string;
+const API = process.env.NEXT_BACKEND_API_URL as string;
 
 interface FormData {
   email: string;
