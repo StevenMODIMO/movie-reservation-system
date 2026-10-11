@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Cinema() {
-  const response = await api<Hall[]>("/api/mrs/cinema/halls", {
+  const response = await api<Hall[]>("/api/mrs/cinema", {
     cache: "no-store",
   });
 
@@ -15,7 +15,7 @@ export default async function Cinema() {
     throw new Error(response.error ?? "Failed to fetch cinema halls.");
   }
 
-  const halls: Hall[] = await response.data;
+  const halls: Hall[] = response.data;
   return (
     <main className="space-y-6">
       <div>

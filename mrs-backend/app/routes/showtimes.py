@@ -32,7 +32,7 @@ async def get_all_showtimes(session: Annotated[Session, Depends(get_db_session)]
     )
     return showtimes
 
-@router.post("/create-movie-showtime")
+@router.post("/assign-movie-showtime")
 async def create_movie_showtime(
     movie_id: Annotated[UUID, Form()],
     hall_id: Annotated[UUID, Form()],

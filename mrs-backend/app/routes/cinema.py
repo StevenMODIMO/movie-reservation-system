@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_db_session
 from app.models.cinema import Halls, Seats
+from app.security import require_role
 
 router = APIRouter(
     tags=["Cinema Management"],
@@ -13,8 +14,8 @@ router = APIRouter(
 )
 
 
-@router.get("/halls")
-async def get_halls(
+@router.get("/")
+async def cinema(
     session: Annotated[Session, Depends(get_db_session)],
 ):
     statement = select(Halls).order_by(Halls.hall_name)
@@ -39,6 +40,10 @@ async def get_halls(
         }
         for hall in halls
     ]
+
+@router.get("/halls")
+async def get_halls(session: Annotated[Session, Depends(get_db_session)], role=Depends(require_role)):
+    pass
 
 # Get all seats
 # @router.get("/get-seats")
